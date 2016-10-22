@@ -1,4 +1,5 @@
 # Env Syncer #
+[![Build Status](https://travis-ci.org/bmitch/envsync.svg?branch=master)](https://travis-ci.org/bmitch/envsync)
 
 ## How to install ##
 
