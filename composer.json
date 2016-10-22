@@ -1,0 +1,19 @@
+{
+    "name": "bmitch/envsync",
+    "description": "Environment variable checker for Laravel.",
+    "type": "package",
+    "require": {
+        "php": ">=5.6.4"
+    },
+    "psr-4": {
+        "App\\": "app/",
+        "Bmitch\\Envsync\\": "packages/bmitch/envsync/src"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Bill Mitchell",
+            "email": "wkmitch@gmail.com"
+        }
+    ]
+}
