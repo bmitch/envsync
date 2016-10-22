@@ -7,9 +7,9 @@
 Then add `Bmitch\Envsync\EnvsyncServiceProvider::class` to the Providers array in config/app.php:
 
 ```
-   'providers' => [
-      Bmitch\Envsync\EnvsyncServiceProvider::class,
-   ]
+'providers' => [
+   Bmitch\Envsync\EnvsyncServiceProvider::class,
+]
 ```
 
 Then run `php artisan` and you should see it listed as an available command.
