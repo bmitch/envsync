@@ -15,24 +15,30 @@ class SyncerCommand extends Command
     
     protected $envFilePattern = "/([A-Za-z_]{1,})=/";
 
+    /**
+     * Supressing this for now.
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
     public function handle()
     {
         $files          = $this->getFiles();
         $env['source']  = $this->getEnvsFromFiles($files);
         $env['example'] = $this->getEnvsFrom('.env.example');
         $env['env']     = $this->getEnvsFrom('.env');
-        $env['all']     = array_unique(array_merge($env['env'], $env['example']));
-        $env['all']     = array_unique(array_merge($env['all'], $env['source']));
+        $env['all']     = $this->getAllEnvs($env);
 
         $results = [];
-        foreach ($env['all'] as $index => $variable) {
+
+        foreach ($env['all'] as $variable) {
             $results[$variable] = [];
             $results[$variable]['inSource']     = in_array($variable, $env['source']) ? 'Yes' : 'No';
             $results[$variable]['inSource']     = in_array($variable, $env['source']) ? 'Yes' : 'No';
             $results[$variable]['inEnvExample'] = in_array($variable, $env['example']) ? 'Yes' : 'No';
             $results[$variable]['inEnv']        = in_array($variable, $env['env']) ? 'Yes' : 'No';
         }
+
         $data = [];
+
         foreach ($results as $variable => $result) {
             $data[] = [
                 'variable'     => $variable,
@@ -41,12 +47,9 @@ class SyncerCommand extends Command
                 'inenv'        => $result['inEnv'],
             ];
         }
+
         $headers = ['Variable', 'In Source', 'In .env.example', 'In .env'];
 
-        $tableData = [
-
-            $data,
-        ];
         $this->table($headers, $data);
     }
 
@@ -96,5 +99,14 @@ class SyncerCommand extends Command
         }
 
         return $envs;
+    }
+
+    protected function getAllEnvs(array $currentEnvs)
+    {
+        $allEnvs = [];
+        $allEnvs     = array_unique(array_merge($currentEnvs['env'], $currentEnvs['example']));
+        $allEnvs     = array_unique(array_merge($allEnvs, $currentEnvs['source']));
+
+        return $allEnvs;
     }
 }
