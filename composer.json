@@ -5,8 +5,10 @@
     "require": {
         "php": ">=5.6.4"
     },
-    "psr-4": {
-        "Bmitch\\Envsync\\": "src/"
+    "autoload": {
+        "psr-4": {
+            "Bmitch\\Envsync\\": "src/"
+        },
     },
     "license": "MIT",
     "authors": [
