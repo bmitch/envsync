@@ -21,8 +21,8 @@ class SyncerCommand extends Command
         $env['source']  = $this->getEnvsFromFiles($files);
         $env['example'] = $this->getEnvsFrom('.env.example');
         $env['env']     = $this->getEnvsFrom('.env');
-        $env['all']     = array_unique (array_merge ($env['env'], $env['example']));
-        $env['all']     = array_unique (array_merge ($env['all'], $env['source']));
+        $env['all']     = array_unique(array_merge($env['env'], $env['example']));
+        $env['all']     = array_unique(array_merge($env['all'], $env['source']));
 
         $results = [];
         foreach ($env['all'] as $index => $variable) {
@@ -31,7 +31,6 @@ class SyncerCommand extends Command
             $results[$variable]['inSource']     = in_array($variable, $env['source']) ? 'Yes' : 'No';
             $results[$variable]['inEnvExample'] = in_array($variable, $env['example']) ? 'Yes' : 'No';
             $results[$variable]['inEnv']        = in_array($variable, $env['env']) ? 'Yes' : 'No';
-
         }
         $data = [];
         foreach ($results as $variable => $result) {
@@ -49,28 +48,23 @@ class SyncerCommand extends Command
             $data,
         ];
         $this->table($headers, $data);
-
-
-
     }
 
     protected function getFiles()
     {
         $folder = $this->argument('folder');
         $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($folder));
-        $files = []; 
+        $files = [];
 
         foreach ($iterator as $file) {
-
-            if ($file->isDir()){ 
+            if ($file->isDir()) {
                 continue;
             }
 
             if ($file->getExtension() != 'php') {
                 continue;
             }
-            $files[] = $file->getPathname(); 
-
+            $files[] = $file->getPathname();
         }
 
         return $files;
