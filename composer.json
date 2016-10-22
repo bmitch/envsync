@@ -6,8 +6,7 @@
         "php": ">=5.6.4"
     },
     "psr-4": {
-        "App\\": "app/",
-        "Bmitch\\Envsync\\": "packages/bmitch/envsync/src"
+        "Bmitch\\Envsync\\": "src"
     },
     "license": "MIT",
     "authors": [
