@@ -7,17 +7,37 @@ use Illuminate\Console\Command;
 class SyncerCommand extends Command
 {
 
+    /**
+     * The name of the command
+     * @var string
+     */
     protected $signature      = 'bmitch:env-sync {folder=. : Folder to scan"}';
     
+    /**
+     * The command's description.
+     * @var string
+     */
     protected $description    = 'Checks source code, .env file, .env.example file and ensures all are synced.';
     
+    /**
+     * Regex pattern to extract environmenet variables
+     * from a PHP file.
+     * @var  string
+     */
     protected $phpFilePattern = "/env\(['\"]([A-Za-z_]{1,})/";
     
+    /**
+     * Regex pattern to extract environment variables
+     * from an environment file.
+     * @var string
+     */
     protected $envFilePattern = "/([A-Za-z_]{1,})=/";
 
     /**
      * Supressing this for now.
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * Runs the command.
+     * @return void
      */
     public function handle()
     {
@@ -53,6 +73,10 @@ class SyncerCommand extends Command
         $this->table($headers, $data);
     }
 
+    /**
+     * Gets all the PHP files to inspect.
+     * @return array
+     */
     protected function getFiles()
     {
         $folder = $this->argument('folder');
@@ -73,7 +97,13 @@ class SyncerCommand extends Command
         return $files;
     }
 
-    protected function getEnvsFromFiles($files)
+    /**
+     * Gets a list of environment varibles from
+     * the provided $files.
+     * @param  array $files Files.
+     * @return array
+     */
+    protected function getEnvsFromFiles(array $files)
     {
         $envs = [];
         foreach ($files as $file) {
@@ -82,6 +112,12 @@ class SyncerCommand extends Command
         return $envs;
     }
 
+    /**
+     * Gets a list of environment varibles
+     * from the provided $file.
+     * @param  string $file Path and file name.
+     * @return array
+     */
     protected function getEnvsFrom($file)
     {
         $contents = file_get_contents($file);
@@ -101,6 +137,12 @@ class SyncerCommand extends Command
         return $envs;
     }
 
+    /**
+     * Looks through all the current env variables from all
+     * sources and makes a master list of all of them.
+     * @param  array $currentEnvs Current Env Variables.
+     * @return array
+     */
     protected function getAllEnvs(array $currentEnvs)
     {
         $allEnvs = [];
