@@ -2,23 +2,11 @@
 
 namespace Bmitch\Envsync;
 
-use Illuminate\Console\Command;
+use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
-class SyncerCommand extends Command
+class SyncerCommand
 {
-
-    /**
-     * The name of the command
-     * @var string
-     */
-    protected $signature      = 'bmitch:env-sync {folder=. : Folder to scan"}';
-    
-    /**
-     * The command's description.
-     * @var string
-     */
-    protected $description    = 'Checks source code, .env file, .env.example file and ensures all are synced.';
-    
     /**
      * Regex pattern to extract environmenet variables
      * from a PHP file.
@@ -34,6 +22,12 @@ class SyncerCommand extends Command
     protected $envFilePattern = "/([A-Za-z_]{1,})=/";
 
     /**
+     * Holds the command line arguments.
+     * @var array
+     */
+    private $arguments = [];
+
+    /**
      * Supressing this for now.
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * Runs the command.
@@ -41,6 +35,10 @@ class SyncerCommand extends Command
      */
     public function handle()
     {
+        $args = $_SERVER['argv'];
+        array_shift($args);
+        $this->arguments = $args;
+
         $files          = $this->getFiles();
         $env['source']  = $this->getEnvsFromFiles($files);
         $env['example'] = $this->getEnvsFrom('.env.example');
@@ -70,7 +68,9 @@ class SyncerCommand extends Command
 
         $headers = ['Variable', 'In Source', 'In .env.example', 'In .env'];
 
-        $this->table($headers, $data);
+        $table = new Table(new ConsoleOutput);
+
+        $table->setHeaders($headers)->setRows($data)->render();
     }
 
     /**
@@ -79,7 +79,8 @@ class SyncerCommand extends Command
      */
     protected function getFiles()
     {
-        $folder = $this->argument('folder');
+        $folder = $this->arguments[0];
+
         $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($folder));
         $files = [];
 
