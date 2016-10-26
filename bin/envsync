@@ -1,0 +1,9 @@
+#!/usr/bin/env php
+<?php
+
+include_once __DIR__ . '/../../../autoload.php';
+include_once __DIR__ . '/../src/SyncerCommand.php';
+
+
+$cli = new Bmitch\Envsync\SyncerCommand();
+$cli->handle();
