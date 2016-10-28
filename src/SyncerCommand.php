@@ -4,45 +4,41 @@ namespace Bmitch\Envsync;
 
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Bmitch\Envsync\Collectors\FileCollector;
+use Bmitch\Envsync\Finders\EnvironmentFinder;
 
 class SyncerCommand
 {
-    /**
-     * Regex pattern to extract environmenet variables
-     * from a PHP file.
-     * @var  string
-     */
-    protected $phpFilePattern = "/env\(['\"]([A-Za-z_]{1,})/";
-    
-    /**
-     * Regex pattern to extract environment variables
-     * from an environment file.
-     * @var string
-     */
-    protected $envFilePattern = "/([A-Za-z_]{1,})=/";
 
     /**
-     * Holds the command line arguments.
-     * @var array
+     * Creates a new instance of the SyncerCommand.
+     * @param FileCollector     $fileCollector File Collector.
+     * @param EnvironmentFinder $envFinder     Environment Variable Filder.
      */
-    private $arguments = [];
+    public function __construct(FileCollector $fileCollector, EnvironmentFinder $envFinder)
+    {
+        $this->fileCollector = $fileCollector;
+        $this->envFinder = $envFinder;
+    }
 
     /**
+     * Runs the command.
      * Supressing this for now.
      * @SuppressWarnings(PHPMD.NPathComplexity)
-     * Runs the command.
+     * @param  array $arguments Command line arguments.
      * @return void
      */
-    public function handle()
+    public function handle(array $arguments)
     {
-        $args = $_SERVER['argv'];
-        array_shift($args);
-        $this->arguments = $args;
+        $this->handleArguments($arguments);
 
-        $files          = $this->getFiles();
-        $env['source']  = $this->getEnvsFromFiles($files);
-        $env['example'] = $this->getEnvsFrom('.env.example');
-        $env['env']     = $this->getEnvsFrom('.env');
+        $files = $this->fileCollector
+                    ->get('.php')
+                    ->from($this->folder);
+
+        $env['source']  = $this->envFinder->getFromFiles($files);
+        $env['example'] = $this->envFinder->getFromFile('.env.example');
+        $env['env']     = $this->envFinder->getFromFile('.env');
         $env['all']     = $this->getAllEnvs($env);
 
         $results = [];
@@ -74,71 +70,6 @@ class SyncerCommand
     }
 
     /**
-     * Gets all the PHP files to inspect.
-     * @return array
-     */
-    protected function getFiles()
-    {
-        $folder = $this->arguments[0];
-
-        $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($folder));
-        $files = [];
-
-        foreach ($iterator as $file) {
-            if ($file->isDir()) {
-                continue;
-            }
-
-            if ($file->getExtension() != 'php') {
-                continue;
-            }
-            $files[] = $file->getPathname();
-        }
-
-        return $files;
-    }
-
-    /**
-     * Gets a list of environment varibles from
-     * the provided $files.
-     * @param  array $files Files.
-     * @return array
-     */
-    protected function getEnvsFromFiles(array $files)
-    {
-        $envs = [];
-        foreach ($files as $file) {
-                $envs = array_merge($envs, $this->getEnvsFrom($file));
-        }
-        return $envs;
-    }
-
-    /**
-     * Gets a list of environment varibles
-     * from the provided $file.
-     * @param  string $file Path and file name.
-     * @return array
-     */
-    protected function getEnvsFrom($file)
-    {
-        $contents = file_get_contents($file);
-
-        $envs = [];
-
-        if (preg_match("/.*.php/", $file)) {
-            preg_match_all($this->phpFilePattern, $contents, $matches);
-        } else {
-            preg_match_all($this->envFilePattern, $contents, $matches);
-        }
-
-        if (isset($matches[1])) {
-            $envs = array_merge($envs, $matches[1]);
-        }
-
-        return $envs;
-    }
-
-    /**
      * Looks through all the current env variables from all
      * sources and makes a master list of all of them.
      * @param  array $currentEnvs Current Env Variables.
@@ -151,5 +82,20 @@ class SyncerCommand
         $allEnvs     = array_unique(array_merge($allEnvs, $currentEnvs['source']));
 
         return $allEnvs;
+    }
+
+    /**
+     * Collects the command line arguments.
+     * @param  array $arguments Command line arguments.
+     * @return void
+     */
+    protected function handleArguments(array $arguments)
+    {
+        // Default value
+        $this->folder = '.';
+
+        if (isset($arguments[1])) {
+            $this->folder = $arguments[1];
+        }
     }
 }
