@@ -16,8 +16,6 @@ class EnvironmentFinder
         } else {
             return EnvFileFinder::find($file);
         }
-
-        return [];
     }
 
     /**
