@@ -10,6 +10,24 @@ class SyncerCommand
 {
 
     /**
+     * Instance of the FileCollector class.
+     * @var FileCollector
+     */
+    protected $fileCollector;
+
+    /**
+     * Instance of the EnvironmentFilder class.
+     * @var EnvironmentFinder
+     */
+    protected $envFinder;
+
+    /**
+     * Instance of the TableBuilder class.
+     * @var TableBuilder
+     */
+    protected $tableBuilder;
+
+    /**
      * Creates a new instance of the SyncerCommand.
      * @param FileCollector     $fileCollector File Collector.
      * @param EnvironmentFinder $envFinder     Environment Variable Filder.
