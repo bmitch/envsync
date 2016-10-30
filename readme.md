@@ -2,6 +2,7 @@
 [![Build Status](https://travis-ci.org/bmitch/envsync.svg?branch=master)](https://travis-ci.org/bmitch/envsync)
 [![Code Climate](https://codeclimate.com/github/bmitch/envsync/badges/gpa.svg)](https://codeclimate.com/github/bmitch/envsync)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/bmitch/envsync/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/bmitch/envsync/?branch=master)
+[![codecov](https://codecov.io/gh/bmitch/envsync/branch/master/graph/badge.svg)](https://codecov.io/gh/bmitch/envsync)
 
 ## How to install ##
 
