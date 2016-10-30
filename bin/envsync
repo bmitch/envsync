@@ -4,6 +4,10 @@
 include_once __DIR__ . '/../../../autoload.php';
 include_once __DIR__ . '/../src/SyncerCommand.php';
 
+use Bmitch\Envsync\Collectors\FileCollector;
+use Bmitch\Envsync\Finders\EnvironmentFinder;
+$fileCollector = new FileCollector;
+$envFinder = new EnvironmentFinder;
 
-$cli = new Bmitch\Envsync\SyncerCommand();
-$cli->handle();
+$cli = new Bmitch\Envsync\SyncerCommand($fileCollector, $envFinder);
+$cli->handle($argv);
