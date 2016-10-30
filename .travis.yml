@@ -9,8 +9,12 @@ before_script:
 
 script:
  - php vendor/sensiolabs/security-checker/security-checker security:check composer.lock
+ - vendor/bin/phpunit --coverage-clover=coverage.xml
  - vendor/bin/phpmd src text codesize,unusedcode,naming
  - vendor/bin/phpcs --standard=psr2 src
  - vendor/bin/phpcs -n --standard=phpcsdocblocks.xml src
  - vendor/bin/phploc src --progress
  - vendor/bin/phpcpd src
+
+after_success:
+ - bash <(curl -s https://codecov.io/bash)
