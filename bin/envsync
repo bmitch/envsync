@@ -6,8 +6,7 @@ include_once __DIR__ . '/../src/SyncerCommand.php';
 
 use Bmitch\Envsync\Collectors\FileCollector;
 use Bmitch\Envsync\Finders\EnvironmentFinder;
-$fileCollector = new FileCollector;
-$envFinder = new EnvironmentFinder;
+use Bmitch\Envsync\Builders\TableBuilder;
 
-$cli = new Bmitch\Envsync\SyncerCommand($fileCollector, $envFinder);
+$cli = new Bmitch\Envsync\SyncerCommand(new FileCollector, new EnvironmentFinder, new TableBuilder);
 $cli->handle($argv);
