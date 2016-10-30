@@ -4,7 +4,8 @@
     "type": "package",
     "require": {
         "php": ">=5.6.4",
-        "symfony/console": "^3.1"
+        "symfony/console": "^3.1",
+        "phpunit/phpunit": "^5.6"
     },
     "bin": [
         "bin/envsync"
@@ -19,7 +20,10 @@
     "autoload": {
         "psr-4": {
             "Bmitch\\Envsync\\": "src/"
-        }
+        },
+        "classmap": [
+            "test/FileSystemTest.php"
+        ]
     },
     "license": "MIT",
     "authors": [
