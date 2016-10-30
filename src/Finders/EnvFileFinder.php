@@ -16,8 +16,12 @@ class EnvFileFinder
      * @param  string $file Path and filename.
      * @return array
      */
-    public function find($file)
+    public static function find($file)
     {
+        if (! file_exists($file)) {
+            return [];
+        }
+
         $contents = file_get_contents($file);
 
         $envs = [];
