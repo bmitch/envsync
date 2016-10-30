@@ -4,6 +4,13 @@ use Bmitch\Envsync\Finders\EnvironmentFinder;
 
 class EnvironmentFinderTest extends FileSystemTest
 {
+
+    /**
+     * The EnvironmentFinder class we'll be testing in this class.
+     * @var EnvironmentFinder
+     */
+    protected $envFinder;
+
     /**
      * @test
      */

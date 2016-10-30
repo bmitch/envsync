@@ -13,9 +13,6 @@ abstract class FileSystemTest extends PHPUnit_Framework_TestCase
     protected function removeTempFolder()
     {
         if (file_exists($this->path)) {
-
-
-            // var_dump(glob($this->path . '/' . '{,.}[!.,!..]*',GLOB_MARK|GLOB_BRACE));exit;
             array_map('unlink', glob($this->path . '/' . '{,.}[!.,!..]*',GLOB_MARK|GLOB_BRACE));
             rmdir($this->path);
         }

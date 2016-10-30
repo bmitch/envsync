@@ -28,6 +28,12 @@ class SyncerCommand
     protected $tableBuilder;
 
     /**
+     * The source colde folder that will be inspected.
+     * @var string
+     */
+    protected $folder;
+
+    /**
      * Creates a new instance of the SyncerCommand.
      * @param FileCollector     $fileCollector File Collector.
      * @param EnvironmentFinder $envFinder     Environment Variable Filder.
@@ -42,8 +48,6 @@ class SyncerCommand
 
     /**
      * Runs the command.
-     * Supressing this for now.
-     * @SuppressWarnings(PHPMD.NPathComplexity)
      * @param  array $arguments Command line arguments.
      * @return void
      */

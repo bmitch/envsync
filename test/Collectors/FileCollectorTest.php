@@ -2,6 +2,13 @@
 
 class FileCollectorTest extends FileSystemTest
 {
+
+    /**
+     * The FileCollector object we'l be testing in this class.
+     * @var FileCollector
+     */
+    protected $fileCollector;
+
     /**
      * @test
      */
