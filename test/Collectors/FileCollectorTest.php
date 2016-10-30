@@ -5,7 +5,7 @@ class FileCollectorTest extends FileSystemTest
 
     /**
      * The FileCollector object we'l be testing in this class.
-     * @var FileCollector
+     * @var Bmitch\Envsync\Collectors\FileCollector\FileCollector
      */
     protected $fileCollector;
 
