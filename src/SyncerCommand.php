@@ -2,10 +2,9 @@
 
 namespace Bmitch\Envsync;
 
-use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Output\ConsoleOutput;
 use Bmitch\Envsync\Collectors\FileCollector;
 use Bmitch\Envsync\Finders\EnvironmentFinder;
+use Bmitch\Envsync\Builders\TableBuilder;
 
 class SyncerCommand
 {
@@ -14,11 +13,13 @@ class SyncerCommand
      * Creates a new instance of the SyncerCommand.
      * @param FileCollector     $fileCollector File Collector.
      * @param EnvironmentFinder $envFinder     Environment Variable Filder.
+     * @param TableBuilder      $tableBuilder  Table Builder.
      */
-    public function __construct(FileCollector $fileCollector, EnvironmentFinder $envFinder)
+    public function __construct(FileCollector $fileCollector, EnvironmentFinder $envFinder, TableBuilder $tableBuilder)
     {
         $this->fileCollector = $fileCollector;
         $this->envFinder = $envFinder;
+        $this->tableBuilder = $tableBuilder;
     }
 
     /**
@@ -32,41 +33,54 @@ class SyncerCommand
     {
         $this->handleArguments($arguments);
 
+        $envData = $this->getEnvironmentVariables();
+
+        $results = $this->getResults($envData);
+
+        $this->tableBuilder->outputTable($results);
+    }
+
+    /**
+     * Gets a list of the environment variables defined in the
+     * source code, .env and .env.example file.
+     * @return array
+     */
+    protected function getEnvironmentVariables()
+    {
         $files = $this->fileCollector
                     ->get('.php')
                     ->from($this->folder);
 
+        $env            = [];
         $env['source']  = $this->envFinder->getFromFiles($files);
         $env['example'] = $this->envFinder->getFromFile('.env.example');
         $env['env']     = $this->envFinder->getFromFile('.env');
-        $env['all']     = $this->getAllEnvs($env);
+        $env['all']     = $this->mergeEnvs($env);
 
+        return $env;
+    }
+
+    /**
+     * Takes the list of environment variables defined and creates
+     * a results array showing each variable and where it is or is not
+     * defined.
+     * @param  array $envData Environment Variable Data.
+     * @return array
+     */
+    protected function getResults(array $envData)
+    {
         $results = [];
 
-        foreach ($env['all'] as $variable) {
-            $results[$variable] = [];
-            $results[$variable]['inSource']     = in_array($variable, $env['source']) ? 'Yes' : 'No';
-            $results[$variable]['inSource']     = in_array($variable, $env['source']) ? 'Yes' : 'No';
-            $results[$variable]['inEnvExample'] = in_array($variable, $env['example']) ? 'Yes' : 'No';
-            $results[$variable]['inEnv']        = in_array($variable, $env['env']) ? 'Yes' : 'No';
-        }
-
-        $data = [];
-
-        foreach ($results as $variable => $result) {
-            $data[] = [
+        foreach ($envData['all'] as $variable) {
+            $results[] = [
                 'variable'     => $variable,
-                'insource'     => $result['inSource'],
-                'inenvexample' => $result['inEnvExample'],
-                'inenv'        => $result['inEnv'],
+                'insource'     => in_array($variable, $envData['source']) ? 'Yes' : 'No',
+                'inenvexample' => in_array($variable, $envData['example']) ? 'Yes' : 'No',
+                'inenv'        => in_array($variable, $envData['env']) ? 'Yes' : 'No',
             ];
         }
 
-        $headers = ['Variable', 'In Source', 'In .env.example', 'In .env'];
-
-        $table = new Table(new ConsoleOutput);
-
-        $table->setHeaders($headers)->setRows($data)->render();
+        return $results;
     }
 
     /**
@@ -75,7 +89,7 @@ class SyncerCommand
      * @param  array $currentEnvs Current Env Variables.
      * @return array
      */
-    protected function getAllEnvs(array $currentEnvs)
+    protected function mergeEnvs(array $currentEnvs)
     {
         $allEnvs = [];
         $allEnvs     = array_unique(array_merge($currentEnvs['env'], $currentEnvs['example']));
