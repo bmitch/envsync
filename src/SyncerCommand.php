@@ -10,6 +10,18 @@ class SyncerCommand
 {
 
     /**
+     * Will be returned when program exits.
+     * @var integer
+     */
+    protected $exitCode = 0;
+
+    /**
+     * The mode the program is running in.
+     * @var string
+     */
+    protected $mode;
+
+    /**
      * Instance of the FileCollector class.
      * @var FileCollector
      */
@@ -53,13 +65,29 @@ class SyncerCommand
      */
     public function handle(array $arguments)
     {
-        $this->handleArguments($arguments);
+        if (! $this->argumentsValid($arguments)) {
+            echo $this->error;
+            return;
+        }
+
+        print "\n\nEnvSyncer Report - https://github.com/bmitch/envsync\n";
 
         $envData = $this->getEnvironmentVariables();
 
         $results = $this->getResults($envData);
 
-        $this->tableBuilder->outputTable($results);
+        if ($this->mode == 'ci') {
+            $this->checkForCiBuild($results);
+        }
+
+        if ($this->mode == 'deploy') {
+            $this->checkForDeploy($results);
+        }
+
+        $this->tableBuilder->outputTable($results, $this->mode);
+
+
+        exit($this->exitCode);
     }
 
     /**
@@ -121,17 +149,66 @@ class SyncerCommand
     }
 
     /**
-     * Collects the command line arguments.
-     * @param  array $arguments Command line arguments.
+     * If a variable is defined in the source code but
+     * not defined in the .env.example file we write
+     * to the message and set response to 1
+     * @param  array $results Environment Variable Results.
      * @return void
      */
-    protected function handleArguments(array $arguments)
+    protected function checkForCiBuild(array $results)
+    {
+        foreach ($results as $row) {
+            if ($row['insource'] == 'Yes' && $row['inenvexample'] == 'No') {
+                $this->exitCode = 1;
+            }
+        }
+    }
+
+    /**
+     * If a variable is defined in the source code but
+     * not defined in the .env file we write
+     * to the message and set response to 1
+     * @param  array $results Environment Variable Results.
+     * @return void
+     */
+    protected function checkForDeploy(array $results)
+    {
+        foreach ($results as $row) {
+            if ($row['insource'] == 'Yes' && $row['inenv'] == 'No') {
+                $this->exitCode = 1;
+            }
+        }
+    }
+
+    /**
+     * Collects the command line arguments.
+     * @param  array $arguments Command line arguments.
+     * @return boolean
+     */
+    protected function argumentsValid(array $arguments)
     {
         // Default value
         $this->folder = '.';
 
         if (isset($arguments[1])) {
             $this->folder = $arguments[1];
+            if (! file_exists($this->folder)) {
+                $this->error = "Error: Folder {$this->folder} does not exist.";
+                return false;
+            }
         }
+
+        if (isset($arguments[2])) {
+            $this->mode = strtolower($arguments[2]);
+            if (!in_array($this->mode, ['ci', 'deploy', 'default'])) {
+                $this->error = "Error: Invalid argument {$this->mode}";
+                return false;
+            }
+            return true;
+        }
+
+        $this->mode = 'default';
+
+        return true;
     }
 }
