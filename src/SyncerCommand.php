@@ -46,6 +46,12 @@ class SyncerCommand
     protected $folder;
 
     /**
+     * Holds an error message if command runs into an error.
+     * @var string
+     */
+    protected $error;
+
+    /**
      * Creates a new instance of the SyncerCommand.
      * @param FileCollector     $fileCollector File Collector.
      * @param EnvironmentFinder $envFinder     Environment Variable Filder.
