@@ -23,4 +23,8 @@ ratings:
   - "**.rb"
 exclude_paths:
   - "**.MD"
+  - "**.xml"
+  - "**.yml"
+  - "composer.lock"
+  - "composer.json"
   - test/"
